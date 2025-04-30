@@ -1,0 +1,57 @@
+create table usuario (
+    id_usuario int not null primary key AUTO_INCREMENT,
+    nome varchar(100) not null,
+    CPF varchar(11) not null,
+    email varchar(100) not null,
+    senha varchar(20) not NULL,
+    data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+create table feed (
+    id_feed int not null primary key AUTO_INCREMENT,
+    data_publi TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP,
+    id_usuario int not null,
+    conteudo varchar(100),
+    tempo_treino TIME,
+    foto longblob not null,
+    constraint fk_usuario FOREIGN key (id_usuario) REFERENCES usuario(id_usuario)
+);
+
+CREATE TABLE COMENT_FEED (
+    id_coment int not null primary key AUTO_INCREMENT,
+    conteudo_coment varchar(100),
+    id_usuario int not null,
+    data_coment TIMESTAMP default CURRENT_TIMESTAMP,
+    constraint fk_usuario_feed FOREIGN key (id_usuario) REFERENCES usuario(id_usuario)
+);
+
+create table grupo(
+    id_grupo int not NULL PRIMARY key AUTO_INCREMENT,
+    nome_grupo varchar(100),
+    data_criacao TIMESTAMP default CURRENT_TIMESTAMP
+);
+
+create table grupo_membro(
+    id_controle int not null PRIMARY key AUTO_INCREMENT,
+    id_usuario int,
+    id_grupo int,
+    data_entrada TIMESTAMP default CURRENT_TIMESTAMP,
+    constraint fk_usuario_grupo FOREIGN key (id_usuario) REFERENCES usuario(id_usuario),
+    constraint fk_grupo FOREIGN key (id_grupo) REFERENCES grupo(id_grupo)
+);
+
+create table reacao(
+    id_reacao int not null primary key AUTO_INCREMENT,
+    nome_reacao varchar(20)
+);
+
+create table reacao_control(
+    id_controle int not null PRIMARY key AUTO_INCREMENT,
+    id_publi int,
+    id_coment int,
+    id_reacao int,
+    data_reacao TIMESTAMP default CURRENT_TIMESTAMP,
+    constraint fk_publi_feed FOREIGN key (id_publi) REFERENCES feed(id_feed),
+    constraint fk_coment_feed FOREIGN key (id_coment) REFERENCES COMENT_FEED(id_coment),
+    constraint fk_reacao foreign key (id_reacao) REFERENCES reacao(id_reacao)
+)
