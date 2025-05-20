@@ -1,0 +1,167 @@
+CREATE SEQUENCE seq_usuario_gym
+START WITH 1
+INCREMENT BY 1
+nocache
+nocycle;
+
+
+create table usuario_gym (
+    id_usuario_gym int not null primary key ,
+    nome varchar2(100) not null,
+    CPF varchar2(11) not null,
+    email varchar2(100) not null,
+    senha varchar2(20) not NULL,
+    data_cadastro TIMESTAMP DEFAULT SYSDATE
+);
+
+CREATE OR REPLACE TRIGGER trg_usuario_gym
+BEFORE INSERT ON usuario_gym
+FOR EACH ROW
+BEGIN
+    IF :NEW.id_usuario_gym IS NULL THEN
+        SELECT seq_usuario_gym.NEXTVAL INTO :NEW.id_usuario_gym FROM dual;
+    END IF;
+END;
+
+
+CREATE SEQUENCE seq_feed
+START WITH 1
+INCREMENT BY 1
+nocache
+nocycle;
+
+create table feed (
+    id_feed int not null primary key,
+    data_publi date DEFAULT SYSDATE not null,
+    id_usuario int not null,
+    conteudo varchar2(100),
+    tempo_treino int,
+    foto blob not null,
+    constraint fk_usuario FOREIGN key (id_usuario) REFERENCES usuario_gym(id_usuario_gym)
+);
+
+CREATE OR REPLACE TRIGGER trg_feed
+BEFORE INSERT ON feed
+FOR EACH ROW
+BEGIN
+    IF :NEW.id_feed IS NULL THEN
+        SELECT seq_feed.NEXTVAL INTO :NEW.id_feed FROM dual;
+    END IF;
+END;
+
+
+CREATE SEQUENCE seq_coment_feed
+START WITH 1
+INCREMENT BY 1
+nocache
+nocycle;
+
+CREATE TABLE coment_feed (
+    id_coment int not null primary key ,
+    conteudo_coment varchar2(100),
+    id_usuario int not null,
+    data_coment date default SYSDATE,
+    constraint fk_usuario_feed FOREIGN key (id_usuario) REFERENCES usuario_gym(id_usuario_gym)
+);
+
+CREATE OR REPLACE TRIGGER trg_coment_feed
+BEFORE INSERT ON coment_feed
+FOR EACH ROW
+BEGIN
+    IF :NEW.id_coment IS NULL THEN
+        SELECT seq_coment_feed.NEXTVAL INTO :NEW.id_coment FROM dual;
+    END IF;
+END;
+
+CREATE SEQUENCE seq_grupo
+START WITH 1
+INCREMENT BY 1
+nocache
+nocycle;
+
+
+create table grupo(
+    id_grupo int not NULL PRIMARY key ,
+    nome_grupo varchar2(100),
+    data_criacao TIMESTAMP default SYSDATE
+);
+
+CREATE OR REPLACE TRIGGER trg_grupo
+BEFORE INSERT ON grupo
+FOR EACH ROW
+BEGIN
+    IF :NEW.id_grupo IS NULL THEN
+        SELECT seq_grupo.NEXTVAL INTO :NEW.id_grupo FROM dual;
+    END IF;
+END;
+
+CREATE SEQUENCE seq_grupo_membro
+START WITH 1
+INCREMENT BY 1
+nocache
+nocycle;
+
+create table grupo_membro(
+    id_controle int not null PRIMARY key ,
+    id_usuario int,
+    id_grupo int,
+    data_entrada date default SYSDATE,
+    constraint fk_usuario_grupo FOREIGN key (id_usuario) REFERENCES usuario_gym(id_usuario_gym),
+    constraint fk_grupo FOREIGN key (id_grupo) REFERENCES grupo(id_grupo)
+);
+
+CREATE OR REPLACE TRIGGER trg_grupo_membro
+BEFORE INSERT ON grupo_membro
+FOR EACH ROW
+BEGIN
+    IF :NEW.id_controle IS NULL THEN
+        SELECT seq_grupo_membro.NEXTVAL INTO :NEW.id_controle FROM dual;
+    END IF;
+END;
+
+CREATE SEQUENCE seq_reacao
+START WITH 1
+INCREMENT BY 1
+nocache
+nocycle;
+
+create table reacao(
+    id_reacao int not null primary key ,
+    nome_reacao varchar2(20)
+);
+
+CREATE OR REPLACE TRIGGER trg_reacao
+BEFORE INSERT ON reacao
+FOR EACH ROW
+BEGIN
+    IF :NEW.id_reacao IS NULL THEN
+        SELECT seq_reacao.NEXTVAL INTO :NEW.id_reacao FROM dual;
+    END IF;
+END;
+
+
+CREATE SEQUENCE seq_reacao_control
+START WITH 1
+INCREMENT BY 1
+nocache
+nocycle;
+
+create table reacao_control(
+    id_controle int not null PRIMARY key ,
+    id_publi int,
+    id_coment int,
+    id_reacao int,
+    data_reacao date default SYSDATE,
+    constraint fk_publi_feed FOREIGN key (id_publi) REFERENCES feed(id_feed),
+    constraint fk_coment_feed FOREIGN key (id_coment) REFERENCES COMENT_FEED(id_coment),
+    constraint fk_reacao foreign key (id_reacao) REFERENCES reacao(id_reacao)
+);
+
+CREATE OR REPLACE TRIGGER trg_reacao_control
+BEFORE INSERT ON reacao_control
+FOR EACH ROW
+BEGIN
+    IF :NEW.id_controle IS NULL THEN
+        SELECT seq_reacao_control.NEXTVAL INTO :NEW.id_controle FROM dual;
+    END IF;
+END;
